@@ -25,9 +25,9 @@ trait ValidatorGenerator
             
             if($validator->fails()){
                 throw new MeteorValidatorException($validator->errors());
-            }else{
-                return $class->Valdations();
             }
+            return $class->Validations();
+            
 
         } else {
 
