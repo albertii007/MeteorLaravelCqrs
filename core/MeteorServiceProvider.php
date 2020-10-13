@@ -2,6 +2,7 @@
 
 namespace MeteorCqrs\Meteor;
 
+use Closure;
 use Illuminate\Support\ServiceProvider;
 use MeteorCqrs\Meteor\IMeteorHandler;
 use ReflectionClass;
@@ -19,11 +20,19 @@ class MeteorServiceProvider extends ServiceProvider
     public function registerService():void
     {
 
-        $routeCollection = $this->app->router->getRoutes();
+        $routeCollection = $this->app->router->getRoutes()->get();
+        $data = null;
 
-        $currentRoute = $routeCollection[$this->getPath()];
+        foreach ($routeCollection as $key => $value) {
+            if($value->uri == $this->getPath()->path && $value->methods[0] == $this->getPath()->method){
+                $data = $value;
+                break;
+            }
+        }
 
-        $classAndFunction = $this->getController($currentRoute['action']);
+        if($data == null) return;
+
+        $classAndFunction = $this->getController($data->action);
 
         if($classAndFunction == 'None') return;
 
@@ -49,18 +58,39 @@ class MeteorServiceProvider extends ServiceProvider
         $this->app->bind(IMeteorHandler::class, $class->getClass()->name);
     }
 
-    private function getPath(): string
+    private function getPath(): object
     {
-        $path = preg_replace('#/+#','/',$_SERVER['REQUEST_URI']);
+        $actual_link = url()->current();
 
-        $parsedPath = parse_url($path);
+        try {
+            $parsedPath = parse_url($actual_link);
 
-        return (string)$_SERVER['REQUEST_METHOD'].$parsedPath['path'];
+            $uri = $parsedPath['path'];
+    
+            if($uri[0] === '/'){
+                $uri = substr($uri,1);
+            }
+
+            $method = $_SERVER['REQUEST_METHOD'];
+
+        } catch (\Throwable $th) {
+            $uri = '/';
+            $method = '';
+        }
+       
+
+        return (object)[
+            "path" => $uri,
+            "method"=>$method
+        ];
     }
 
     protected function getController(array $action)
     {
         if (empty($action['uses'])) {
+            return 'None';
+        }
+        else if($action['uses'] instanceof Closure) {
             return 'None';
         }
         else if(!empty($action['as'])){
