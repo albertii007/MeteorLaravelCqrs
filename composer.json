@@ -1,5 +1,5 @@
 {
-    "name": "meteorcqrs/meteor",
+    "name": "meteorcqrs/meteorlaravel",
     "description": "This package is for cqrs pattern",
     "type": "library",
     "license": "MIT",
