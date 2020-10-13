@@ -1,0 +1,19 @@
+{
+    "name": "meteorcqrs/meteor",
+    "description": "This package is for cqrs pattern",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Albert Kunushevci",
+            "email": "albertii.kun@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "MeteorCqrs\\Meteor\\": "core"
+        }
+    }
+}
