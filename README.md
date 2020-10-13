@@ -1,5 +1,7 @@
 This package is for supporting CQRS Pattern on Laravel.
 
+Youtube Tutorial: https://www.youtube.com/watch?v=_r5MFo0exVg&feature=youtu.be
+
 install package composer require meteorcqrs/meteorlaravel
 
 Step 1.
