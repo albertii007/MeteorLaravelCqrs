@@ -2,12 +2,13 @@
 
 namespace MeteorCqrs\Meteor\src;
 
-use Illuminate\Foundation\Validation\ValidatesRequests;
 use ReflectionClass;
+use Illuminate\Support\Facades\Validator;
+use MeteorCqrs\Meteor\exception\MeteorValidatorException;
 
 trait ValidatorGenerator
 {
-    use ClassNameRule, CreateValidatorFile, ValidatesRequests;
+    use ClassNameRule, CreateValidatorFile;
 
     private function Validator($classpath, $data = null)
     {        
@@ -18,10 +19,15 @@ trait ValidatorGenerator
         $validator = $this->ClassName($reflectClass->getName());
 
         if (class_exists($validator)) {
-
             $class = new $validator;
 
-            return $this->validate($data,$class->Validations(),$class->Messages());
+            $validator = Validator::make($data->all(),$class->Validations(),$class->Messages());
+            
+            if($validator->fails()){
+                throw new MeteorValidatorException($validator->errors());
+            }else{
+                return $class->Valdations();
+            }
 
         } else {
 
